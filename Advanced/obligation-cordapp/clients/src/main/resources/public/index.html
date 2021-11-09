@@ -16,7 +16,7 @@ COMING WEEKS, WE'LL WRITE A TUTORIAL ON HOW BEST TO DO THIS.
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Example CorDapp</title>
+    <title>[{{demoApp.thisNode.commonName}}] eWallet</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
           integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
@@ -62,7 +62,7 @@ COMING WEEKS, WE'LL WRITE A TUTORIAL ON HOW BEST TO DO THIS.
             </div>
             <div class="form-group">
                 <label for="createIOUCurrency" class="control-label">Currency (ISO code):</label>
-                <input type="text" ng-model="createIOUModal.form.currency" class="form-control" id="createIOUCurrency">
+                <input type="text" ng-model="createIOUModal.form.currency" class="form-control" id="createIOUCurrency" value="HKD">
             </div>
             <div class="form-group">
                 <label for="createIOUAmount" class="control-label">Amount (Int):</label>
@@ -97,7 +97,7 @@ COMING WEEKS, WE'LL WRITE A TUTORIAL ON HOW BEST TO DO THIS.
         <div class="modal-body">
             <div class="form-group">
                 <label for="issueCashCurrency" class="control-label">Currency (ISO code):</label>
-                <input type="text" ng-model="issueCashModal.form.currency" class="form-control" id="issueCashCurrency">
+                <input type="text" ng-model="issueCashModal.form.currency" class="form-control" id="issueCashCurrency" value="HKD">
             </div>
             <div class="form-group">
                 <label for="issueCashAmount" class="control-label">Amount (Int):</label>
@@ -165,7 +165,7 @@ COMING WEEKS, WE'LL WRITE A TUTORIAL ON HOW BEST TO DO THIS.
         <div class="modal-body">
             <div class="form-group">
                 <label for="settleCurrency" class="control-label">Currency (ISO code):</label>
-                <input type="text" ng-model="settleModal.form.currency" class="form-control" id="settleCurrency">
+                <input type="text" ng-model="settleModal.form.currency" class="form-control" id="settleCurrency" value="HKD">
             </div>
             <div class="form-group">
                 <label for="settleAmount" class="control-label">Amount (Int):</label>

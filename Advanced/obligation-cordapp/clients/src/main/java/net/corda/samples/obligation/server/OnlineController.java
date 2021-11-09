@@ -38,13 +38,13 @@ import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
  * Define your API endpoints here.
  */
 @RestController
-@RequestMapping("/api/iou") // The paths for HTTP requests are relative to this base path.
-public class MainController {
+@RequestMapping("/api/hkd") // The paths for HTTP requests are relative to this base path.
+public class OnlineController {
     private static final Logger logger = LoggerFactory.getLogger(RestController.class);
     private final CordaRPCOps proxy;
     private final CordaX500Name me;
 
-    public MainController(NodeRPCConnection rpc) {
+    public OnlineController(NodeRPCConnection rpc) {
         this.proxy = rpc.getProxy();
         this.me = proxy.nodeInfo().getLegalIdentities().get(0).getName();
 
@@ -116,7 +116,13 @@ public class MainController {
         myMap.put("peers", nodeNames);
         return myMap;
     }
-
+/* Offline APIS
+===========================================
+/requestOfflinePayment
+/offlineTransferOffer
+/balance
+/offlineTransferAccept
+ */
     @GetMapping(value = "/notaries", produces = TEXT_PLAIN_VALUE)
     private String notaries() {
         return proxy.notaryIdentities().toString();
@@ -143,25 +149,25 @@ public class MainController {
         myMap.put("state", me.getState());
         return myMap;
     }
-    @GetMapping(value = "/ious",produces = APPLICATION_JSON_VALUE)
-    public List<StateAndRef<IOUState>> getIOUs() {
+    @GetMapping(value = "/requestOnlinePayment",produces = APPLICATION_JSON_VALUE)
+    public List<StateAndRef<IOUState>> getRequestOnlinePayment() {
         // Filter by states type: IOU.
         return proxy.vaultQuery(IOUState.class).getStates();
     }
-    @GetMapping(value = "/cash",produces = APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/decodeInvoice",produces = APPLICATION_JSON_VALUE)
     public List<StateAndRef<Cash.State>> getCash() {
         // Filter by states type: Cash.
         return proxy.vaultQuery(Cash.State.class).getStates();
     }
 
-    @GetMapping(value = "/cash-balances",produces = APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/balance",produces = APPLICATION_JSON_VALUE)
     public Map<Currency,Amount<Currency>> cashBalances(){
         return getCashBalances(proxy);
     }
 
-    @PutMapping(value =  "/issue-iou" , produces = TEXT_PLAIN_VALUE )
+    @PutMapping(value =  "/onlineTransfer" , produces = TEXT_PLAIN_VALUE )
     public ResponseEntity<String> issueIOU(@RequestParam(value = "amount") int amount,
-                                           @RequestParam(value = "currency") String currency,
+                                           @RequestParam(value = "currency", defaultValue = "HKD") String currency,
                                            @RequestParam(value = "party") String party) throws IllegalArgumentException {
         // Get party objects for myself and the counterparty.
         Party me = proxy.nodeInfo().getLegalIdentities().get(0);
@@ -203,7 +209,7 @@ public class MainController {
     @GetMapping(value =  "settle-iou" , produces = TEXT_PLAIN_VALUE )
     public  ResponseEntity<String> settleIOU(@RequestParam(value = "id") String id,
                                              @RequestParam(value = "amount") int amount,
-                                             @RequestParam(value = "currency") String currency) {
+                                             @RequestParam(value = "currency", defaultValue = "HKD") String currency) {
 
         UniqueIdentifier linearId = new UniqueIdentifier(null, UUID.fromString(id));
         try {
@@ -223,7 +229,7 @@ public class MainController {
      */
     @GetMapping(value =  "self-issue-cash" , produces =  TEXT_PLAIN_VALUE )
     public ResponseEntity<String> selfIssueCash(@RequestParam(value = "amount") int amount,
-                      @RequestParam(value = "currency") String currency) {
+                      @RequestParam(value = "currency",defaultValue = "HKD") String currency) {
 
         try {
             Cash.State cashState = proxy.startTrackedFlowDynamic(SelfIssueCashFlow.class,
