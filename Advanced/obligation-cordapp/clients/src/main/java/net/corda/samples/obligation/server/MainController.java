@@ -9,10 +9,7 @@ import net.corda.core.messaging.CordaRPCOps;
 import net.corda.core.node.NodeInfo;
 import net.corda.core.transactions.SignedTransaction;
 import net.corda.finance.contracts.asset.Cash;
-import net.corda.samples.obligation.flows.IOUIssueFlow;
-import net.corda.samples.obligation.flows.IOUSettleFlow;
-import net.corda.samples.obligation.flows.IOUTransferFlow;
-import net.corda.samples.obligation.flows.SelfIssueCashFlow;
+import net.corda.samples.obligation.flows.*;
 import net.corda.samples.obligation.states.IOUState;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.BCStyle;
@@ -190,6 +187,20 @@ public class MainController {
         try {
             proxy.startTrackedFlowDynamic(IOUTransferFlow.InitiatorFlow.class, linearId, newLender).getReturnValue().get();
             return ResponseEntity.status(HttpStatus.CREATED).body("IOU "+linearId.toString()+" transferred to "+party+".");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    @GetMapping(value =  "transfer-cash" , produces =  TEXT_PLAIN_VALUE )
+    public ResponseEntity<String> transferCash(@RequestParam(value = "amount") int amount,
+                                               @RequestParam(value = "currency") String currency,
+                                              @RequestParam(value = "party") String party) {
+        Party recipient = Optional.ofNullable(proxy.wellKnownPartyFromX500Name(CordaX500Name.parse(party))).orElseThrow(() -> new IllegalArgumentException("Unknown party name."));
+        try {
+            Amount amt = new Amount<>((long) amount * 100, Currency.getInstance(currency));
+            proxy.startTrackedFlowDynamic(PayCashFlow.class, amt, recipient).getReturnValue().get();
+            return ResponseEntity.status(HttpStatus.CREATED).body("Cash "+amount+" transferred to "+party+".");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
